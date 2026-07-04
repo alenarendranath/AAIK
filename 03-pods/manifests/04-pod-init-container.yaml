@@ -1,0 +1,53 @@
+# Init Container Pattern
+# Init container runs FIRST, completes, then main container starts
+# Use case: wait for dependency, download config, run migration
+# Apply: kubectl apply -f 04-pod-init-container.yaml
+# Watch: kubectl get pod aaik-with-init -w
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: aaik-with-init
+  labels:
+    app: aaik
+spec:
+  initContainers:
+  # Init container 1: simulate downloading configuration
+  - name: init-download-config
+    image: busybox
+    command: ["/bin/sh", "-c"]
+    args:
+    - |
+      echo "Downloading configuration..."
+      sleep 3
+      echo "server { listen 80; location / { return 200 'AAIK configured by init container!
+'; add_header Content-Type text/plain; } }" > /config/nginx.conf
+      echo "Config ready!"
+    volumeMounts:
+    - name: config-vol
+      mountPath: /config
+
+  # Init container 2: wait for external service (simulate)
+  - name: init-wait-for-db
+    image: busybox
+    command: ["/bin/sh", "-c"]
+    args:
+    - |
+      echo "Waiting for database to be ready..."
+      sleep 2
+      echo "Database is ready!"
+
+  # Main container starts only after ALL init containers complete
+  containers:
+  - name: aaik
+    image: nginx:alpine
+    ports:
+    - containerPort: 80
+    volumeMounts:
+    - name: config-vol
+      mountPath: /etc/nginx/conf.d
+      # The config file created by the init container is available here
+
+  volumes:
+  - name: config-vol
+    emptyDir: {}
