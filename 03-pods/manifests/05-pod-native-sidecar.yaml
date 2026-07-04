@@ -1,0 +1,32 @@
+# Native Sidecar Container (Kubernetes 1.29+)
+# An init container with restartPolicy: Always
+# It STARTS before main containers and STAYS RUNNING alongside them
+# It SHUTS DOWN after all main containers exit
+# Apply: kubectl apply -f 05-pod-native-sidecar.yaml
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: aaik-native-sidecar
+  labels:
+    app: aaik
+spec:
+  initContainers:
+  # Native sidecar: restartPolicy: Always makes it behave like a sidecar
+  - name: traffic-monitor
+    image: busybox
+    restartPolicy: Always       # <-- This is what makes it a native sidecar
+    command: ["/bin/sh", "-c"]
+    args:
+    - |
+      echo "Traffic monitor started"
+      while true; do
+        echo "[$(date)] Monitoring traffic..."
+        sleep 10
+      done
+
+  containers:
+  - name: aaik
+    image: nginx:alpine
+    ports:
+    - containerPort: 80
