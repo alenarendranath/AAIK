@@ -1,0 +1,25 @@
+# Step 1: ConfigMap — application configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: aaik-web-config
+  labels:
+    app: aaik-web
+data:
+  APP_ENV: "production"
+  LOG_LEVEL: "info"
+  MAX_CONNECTIONS: "100"
+  nginx.conf: |
+    server {
+      listen 80;
+      server_name _;
+      root /usr/share/nginx/html;
+      index index.html;
+      location /health {
+        return 200 'OK';
+        add_header Content-Type text/plain;
+      }
+      location / {
+        try_files $uri $uri/ =404;
+      }
+    }
