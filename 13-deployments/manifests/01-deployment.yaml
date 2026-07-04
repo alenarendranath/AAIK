@@ -1,0 +1,56 @@
+# Basic Deployment — manages 3 replicas with RollingUpdate
+# Apply:  kubectl apply -f 01-deployment.yaml
+# Update: kubectl set image deployment/aaik-deploy aaik=nginx:1.25
+# Watch:  kubectl rollout status deployment/aaik-deploy
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aaik-deploy
+  labels:
+    app: aaik
+  annotations:
+    kubernetes.io/change-cause: "Initial deployment v1.0"
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: aaik
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1              # allow 1 extra pod during update (total: 4)
+      maxUnavailable: 0        # never go below 3 available pods
+  minReadySeconds: 10          # pod must be ready for 10s before counted as available
+  revisionHistoryLimit: 5      # keep last 5 ReplicaSets for rollback
+  template:
+    metadata:
+      labels:
+        app: aaik
+        version: "1.0"
+    spec:
+      containers:
+      - name: aaik
+        image: nginx:alpine
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "64Mi"
+          limits:
+            cpu: "200m"
+            memory: "128Mi"
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          failureThreshold: 3
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 10
+          periodSeconds: 10
