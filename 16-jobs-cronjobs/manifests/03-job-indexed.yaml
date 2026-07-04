@@ -1,0 +1,25 @@
+# Indexed Job — each pod gets a unique JOB_COMPLETION_INDEX (0..N-1)
+# Useful for sharding work across pods
+# Apply: kubectl apply -f 03-job-indexed.yaml
+# Each pod knows which shard it processes via JOB_COMPLETION_INDEX
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: aaik-indexed-job
+spec:
+  completions: 5
+  parallelism: 5
+  completionMode: Indexed          # enables JOB_COMPLETION_INDEX env var
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+      - name: worker
+        image: busybox
+        command: ["/bin/sh", "-c"]
+        args:
+        - |
+          echo "Processing shard $JOB_COMPLETION_INDEX of 5"
+          sleep 3
+          echo "Shard $JOB_COMPLETION_INDEX complete!"
