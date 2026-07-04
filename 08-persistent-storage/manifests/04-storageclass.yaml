@@ -1,0 +1,30 @@
+# StorageClass — enables dynamic provisioning
+# When a PVC references this StorageClass, a PV is automatically created
+# Note: 'standard' StorageClass is pre-installed in most clusters (minikube, kind, GKE)
+# This example shows a custom StorageClass definition
+
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: aaik-fast
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "false"
+provisioner: docker.io/hostpath   # for Docker Desktop local clusters
+reclaimPolicy: Delete             # delete PV when PVC is deleted
+allowVolumeExpansion: true        # allow resizing PVCs
+volumeBindingMode: WaitForFirstConsumer  # create PV only when pod is scheduled
+
+---
+# Dynamic PVC — uses the default StorageClass
+# No need to create PV manually!
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: aaik-dynamic-pvc
+spec:
+  # No storageClassName = uses cluster's default StorageClass
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
