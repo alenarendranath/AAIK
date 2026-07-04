@@ -1,0 +1,13 @@
+# Step 2: PersistentVolumeClaim — shared storage
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: aaik-web-pvc
+  labels:
+    app: aaik-web
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
