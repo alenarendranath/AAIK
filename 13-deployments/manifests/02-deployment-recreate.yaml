@@ -1,0 +1,28 @@
+# Deployment with Recreate strategy
+# ALL old pods are terminated BEFORE new pods start
+# Causes downtime — use when old/new versions cannot coexist
+# Apply: kubectl apply -f 02-deployment-recreate.yaml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aaik-recreate
+  labels:
+    app: aaik
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: aaik-recreate
+  strategy:
+    type: Recreate             # no rollingUpdate config needed
+  template:
+    metadata:
+      labels:
+        app: aaik-recreate
+    spec:
+      containers:
+      - name: aaik
+        image: nginx:alpine
+        ports:
+        - containerPort: 80
