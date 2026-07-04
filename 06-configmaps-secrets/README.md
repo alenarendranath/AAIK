@@ -18,7 +18,7 @@ data:
   nginx.conf: |
     server {
       listen 80;
-      location / { return 200 'AAIK\n'; }
+      location / { return 200 'AleK8s\n'; }
     }
 ```
 
