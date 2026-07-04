@@ -1,0 +1,24 @@
+# Parallel Job — runs N completions with M parallel pods
+# Apply: kubectl apply -f 02-job-parallel.yaml
+# Watch: kubectl get pods -l job-name=aaik-parallel-job -w
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: aaik-parallel-job
+spec:
+  completions: 6                   # need 6 total successful completions
+  parallelism: 3                   # run 3 pods at a time
+  backoffLimit: 6
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+      - name: worker
+        image: busybox
+        command: ["/bin/sh", "-c"]
+        args:
+        - |
+          echo "Worker pod $HOSTNAME processing item..."
+          sleep $((RANDOM % 10 + 5))
+          echo "Worker pod $HOSTNAME done!"
