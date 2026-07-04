@@ -1,0 +1,73 @@
+# Canary Deployment Pattern
+# Run two Deployments (stable + canary) behind one Service
+# Canary gets ~20% traffic (1 of 5 total pods)
+# Apply: kubectl apply -f 03-deployment-canary.yaml
+# Test:  for i in $(seq 20); do curl <svc-ip>; done  (watch for v2 responses)
+
+# Stable Deployment (4 replicas = 80% traffic)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aaik-stable
+  labels:
+    app: aaik
+    track: stable
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: aaik
+      track: stable
+  template:
+    metadata:
+      labels:
+        app: aaik
+        track: stable
+        version: "1.0"
+    spec:
+      containers:
+      - name: aaik
+        image: nginx:alpine
+        ports:
+        - containerPort: 80
+
+---
+# Canary Deployment (1 replica = ~20% traffic)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aaik-canary
+  labels:
+    app: aaik
+    track: canary
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: aaik
+      track: canary
+  template:
+    metadata:
+      labels:
+        app: aaik
+        track: canary
+        version: "2.0"
+    spec:
+      containers:
+      - name: aaik
+        image: nginx:1.25          # new version being tested
+        ports:
+        - containerPort: 80
+
+---
+# Single Service selects ALL pods (both stable and canary)
+apiVersion: v1
+kind: Service
+metadata:
+  name: aaik-svc
+spec:
+  selector:
+    app: aaik                      # matches both stable and canary pods
+  ports:
+  - port: 80
+    targetPort: 80
