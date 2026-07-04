@@ -1,0 +1,64 @@
+# DaemonSet — runs one pod on every node
+# Apply: kubectl apply -f 01-daemonset.yaml
+# Check: kubectl get ds aaik-agent
+#        kubectl get pods -l app=aaik-agent -o wide  (one per node)
+
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: aaik-agent
+  labels:
+    app: aaik-agent
+spec:
+  selector:
+    matchLabels:
+      app: aaik-agent
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1            # update one node at a time
+  template:
+    metadata:
+      labels:
+        app: aaik-agent
+    spec:
+      tolerations:
+      # Allow running on control-plane nodes too
+      - key: node-role.kubernetes.io/control-plane
+        operator: Exists
+        effect: NoSchedule
+      containers:
+      - name: agent
+        image: busybox
+        command: ["/bin/sh", "-c"]
+        args:
+        - |
+          echo "AAIK agent running on node: $NODE_NAME"
+          while true; do
+            echo "[$(date)] Agent heartbeat from $NODE_NAME"
+            sleep 30
+          done
+        env:
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName    # inject node name via Downward API
+        - name: NODE_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP    # inject node IP
+        resources:
+          requests:
+            cpu: "50m"
+            memory: "32Mi"
+          limits:
+            cpu: "100m"
+            memory: "64Mi"
+        volumeMounts:
+        - name: host-logs
+          mountPath: /host/var/log
+          readOnly: true
+      volumes:
+      - name: host-logs
+        hostPath:
+          path: /var/log
