@@ -1,0 +1,9 @@
+# GatewayClass — defines which controller implements the Gateway
+# Created by infrastructure admin
+
+apiVersion: gateway.networking.k8s.io/v1
+kind: GatewayClass
+metadata:
+  name: aaik-gateway-class
+spec:
+  controllerName: example.com/gateway-controller
