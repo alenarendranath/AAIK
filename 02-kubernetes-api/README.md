@@ -26,7 +26,7 @@ metadata:               # Identity information
   labels:
     app: aaik
   annotations:
-    description: "AAIK demo pod"
+    description: "AleK8s demo pod"
 spec:                   # DESIRED state (you define this)
   containers:
   - name: aaik
