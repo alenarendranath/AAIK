@@ -1,67 +1,64 @@
-# AAIK — Ale Action in Kubernetes 🚀
+# AleK8s — Ale's Kubernetes Learning Repository
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Kubernetes](https://img.shields.io/badge/Kubernetes-1.29+-blue.svg)](https://kubernetes.io)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
+> **AleK8s** is a comprehensive, hands-on Kubernetes learning repository covering all core topics with original YAML manifests, kubectl command references, end-to-end examples, troubleshooting guides, and CKA exam cheatsheets.
 
-> **Original educational content** — All YAML manifests, explanations, and examples are original work by the author. See [DISCLAIMER.md](DISCLAIMER.md) for full legal notice.
+![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)
+![Original Content](https://img.shields.io/badge/Content-Original-green.svg)
+![Kubernetes](https://img.shields.io/badge/Kubernetes-1.29%2B-326CE5?logo=kubernetes)
 
-A hands-on Kubernetes learning repository covering every core concept through practical YAML manifests, kubectl commands, and real-world examples.
+---
 
-## The Demo Application
-
-Throughout this repository we use a simple web application called **AAIK App** (image: `nginx:alpine`) to demonstrate Kubernetes features. It is lightweight, stateless, and works on any cluster.
-
-## Repository Structure
+## Topics
 
 | # | Topic | Concepts |
 |---|-------|----------|
-| 01 | [Getting Started](./01-getting-started/) | Cluster setup, kubectl basics |
-| 02 | [Kubernetes API & Object Model](./02-kubernetes-api/) | API, manifests, apiVersion/kind/metadata/spec/status |
-| 03 | [Pods](./03-pods/) | Single/multi-container, sidecar, init containers |
-| 04 | [Pod Lifecycle & Health](./04-pod-lifecycle/) | Liveness/readiness/startup probes, postStart/preStop hooks |
-| 05 | [Namespaces, Labels & Annotations](./05-namespaces-labels/) | Organizing and selecting resources |
-| 06 | [ConfigMaps & Secrets](./06-configmaps-secrets/) | App configuration, TLS certs, Downward API |
-| 07 | [Volumes](./07-volumes/) | emptyDir, hostPath, configMap, secret, projected volumes |
-| 08 | [Persistent Storage](./08-persistent-storage/) | PV, PVC, StorageClass, CSI, VolumeSnapshots |
-| 09 | [Services & Networking](./09-services/) | ClusterIP, NodePort, LoadBalancer, headless, DNS |
-| 10 | [Ingress](./10-ingress/) | HTTP routing, path rules, TLS termination |
-| 11 | [Gateway API](./11-gateway-api/) | GatewayClass, HTTPRoute, traffic splitting, TLS |
-| 12 | [ReplicaSets](./12-replicasets/) | Scaling, reconciliation loop, pod ownership |
-| 13 | [Deployments](./13-deployments/) | Rolling updates, rollback, canary, blue-green |
-| 14 | [StatefulSets](./14-statefulsets/) | Stable identity, ordered scaling, PVC templates |
-| 15 | [DaemonSets](./15-daemonsets/) | Per-node workloads, node agents |
-| 16 | [Jobs & CronJobs](./16-jobs-cronjobs/) | Batch processing, parallel jobs, scheduling |
+| 01 | [Getting Started](./01-getting-started/) | minikube, kind, kubectl, kubeconfig |
+| 02 | [Kubernetes API](./02-kubernetes-api/) | API groups, object model, kubectl explain |
+| 03 | [Pods](./03-pods/) | Single & multi-container, init containers, native sidecars |
+| 04 | [Pod Lifecycle](./04-pod-lifecycle/) | Liveness, readiness, startup probes, lifecycle hooks |
+| 05 | [Namespaces & Labels](./05-namespaces-labels/) | Namespaces, labels, selectors, annotations |
+| 06 | [ConfigMaps & Secrets](./06-configmaps-secrets/) | Config injection, env vars, volume mounts |
+| 07 | [Volumes](./07-volumes/) | emptyDir, hostPath, projected volumes |
+| 08 | [Persistent Storage](./08-persistent-storage/) | PV, PVC, StorageClass, dynamic provisioning |
+| 09 | [Services](./09-services/) | ClusterIP, NodePort, LoadBalancer, headless |
+| 10 | [Ingress](./10-ingress/) | Routing rules, TLS, multi-path |
+| 11 | [Gateway API](./11-gateway-api/) | GatewayClass, Gateway, HTTPRoute |
+| 12 | [ReplicaSets](./12-replicasets/) | Reconciliation, selectors, HPA |
+| 13 | [Deployments](./13-deployments/) | Rolling updates, canary, blue-green |
+| 14 | [StatefulSets](./14-statefulsets/) | Stable identity, ordered scaling, volumeClaimTemplates |
+| 15 | [DaemonSets](./15-daemonsets/) | Per-node pods, log agents, monitoring |
+| 16 | [Jobs & CronJobs](./16-jobs-cronjobs/) | One-off tasks, parallel jobs, scheduled jobs |
+| 17 | [Security](./17-security/) | RBAC, ServiceAccounts, PodSecurity |
+| 18 | [Extending Kubernetes](./18-extending-kubernetes/) | CRDs, Operators, Admission Webhooks |
 
-## Prerequisites
+---
 
-- A running Kubernetes cluster (see [01-getting-started](./01-getting-started/))
-- `kubectl` installed and configured
-- Basic knowledge of containers and Docker
+## Extras
 
-## Quick Start
+| Folder | Contents |
+|--------|----------|
+| [examples/](./examples/) | End-to-end multi-manifest applications |
+| [troubleshooting/](./troubleshooting/) | Common failures with diagnosis and fixes |
+| [cheatsheets/](./cheatsheets/) | CKA exam tips, kubectl quick reference, YAML patterns |
+
+---
+
+## Usage
 
 ```bash
-git clone https://github.com/alenarendranath/AAIK.git
-cd AAIK
-# Start from topic 01
-cd 01-getting-started && cat README.md
+git clone https://github.com/alenarendranath/AleK8s.git
+cd AleK8s
+
+# Apply a topic
+kubectl apply -f 03-pods/manifests/01-pod-simple.yaml
+
+# Apply a full end-to-end example
+kubectl apply -f examples/full-web-app/
 ```
 
-## How to Use
-
-1. Follow topics in order (01 → 16)
-2. Read `README.md` for the concept explanation
-3. Study `commands.md` for all kubectl commands
-4. Apply manifests from the `manifests/` folder
-5. Experiment, break things, and learn!
+---
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE) — free to use, share, and modify with attribution.
-
-## Disclaimer
-
-This repository is an independent educational resource. See [DISCLAIMER.md](DISCLAIMER.md) for full legal notice.
-
-> *"The best way to learn Kubernetes is to run it."*
+MIT License — see [LICENSE](./LICENSE). Original educational content by Narendranath.  
+See [DISCLAIMER.md](./DISCLAIMER.md) for third-party acknowledgements.
