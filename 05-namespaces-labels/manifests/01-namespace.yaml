@@ -1,0 +1,12 @@
+# Namespace
+# Apply: kubectl apply -f 01-namespace.yaml
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: aaik-dev
+  labels:
+    environment: development
+    team: platform
+  annotations:
+    description: "AAIK development environment"
