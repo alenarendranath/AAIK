@@ -1,0 +1,24 @@
+# Basic Ingress — route by path
+# Requires an Ingress Controller to be installed
+# Apply: kubectl apply -f 01-ingress-basic.yaml
+# Check: kubectl get ing aaik-ingress (wait for ADDRESS)
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: aaik-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx            # which controller handles this
+  rules:
+  - host: aaik.example.com          # hostname-based routing
+    http:
+      paths:
+      - path: /                      # route all traffic
+        pathType: Prefix
+        backend:
+          service:
+            name: aaik-clusterip
+            port:
+              number: 80
