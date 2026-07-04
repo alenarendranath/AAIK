@@ -1,0 +1,37 @@
+# postStart and preStop Lifecycle Hooks
+# postStart: runs right after container starts (parallel to main process)
+# preStop:   runs before SIGTERM is sent (for graceful shutdown)
+# Apply: kubectl apply -f 06-lifecycle-hooks.yaml
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: aaik-hooks
+  labels:
+    app: aaik
+spec:
+  terminationGracePeriodSeconds: 60   # max time for graceful shutdown
+  containers:
+  - name: aaik
+    image: nginx:alpine
+    ports:
+    - containerPort: 80
+    lifecycle:
+      postStart:
+        exec:
+          command:
+          - /bin/sh
+          - -c
+          - echo "Container started at $(date)" > /tmp/start.log
+      preStop:
+        exec:
+          command:
+          - /bin/sh
+          - -c
+          - nginx -s quit; while killall -0 nginx 2>/dev/null; do sleep 1; done
+    livenessProbe:
+      httpGet:
+        path: /
+        port: 80
+      initialDelaySeconds: 10
+      periodSeconds: 10
