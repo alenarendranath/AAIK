@@ -1,0 +1,22 @@
+# Liveness Probe — TCP Socket
+# Checks if the port is accepting connections
+# Apply: kubectl apply -f 03-liveness-tcp.yaml
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: aaik-liveness-tcp
+  labels:
+    app: aaik
+spec:
+  containers:
+  - name: aaik
+    image: nginx:alpine
+    ports:
+    - containerPort: 80
+    livenessProbe:
+      tcpSocket:
+        port: 80
+      initialDelaySeconds: 5
+      periodSeconds: 10
+      failureThreshold: 3
