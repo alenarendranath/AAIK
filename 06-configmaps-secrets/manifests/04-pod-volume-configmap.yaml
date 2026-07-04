@@ -1,0 +1,35 @@
+# Mount ConfigMap as files in a volume
+# Each ConfigMap key becomes a FILE in the mount directory
+# Apply: kubectl apply -f 04-pod-volume-configmap.yaml
+# Verify: kubectl exec aaik-vol-config -- ls /etc/aaik-config/
+#         kubectl exec aaik-vol-config -- cat /etc/aaik-config/nginx.conf
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: aaik-vol-config
+  labels:
+    app: aaik
+spec:
+  containers:
+  - name: aaik
+    image: nginx:alpine
+    volumeMounts:
+    # Mount entire ConfigMap (all keys as files)
+    - name: config-vol
+      mountPath: /etc/aaik-config
+      readOnly: true
+    # Mount specific key as a file
+    - name: nginx-conf-vol
+      mountPath: /etc/nginx/conf.d/default.conf
+      subPath: nginx.conf        # mount only this key as this filename
+  volumes:
+  - name: config-vol
+    configMap:
+      name: aaik-config
+  - name: nginx-conf-vol
+    configMap:
+      name: aaik-config
+      items:
+      - key: nginx.conf
+        path: nginx.conf         # filename in the mount directory
