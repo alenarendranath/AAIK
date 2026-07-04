@@ -1,0 +1,31 @@
+# Role + RoleBinding — grants pod-reader permissions to aaik-sa
+# Apply: kubectl apply -f 02-role-rolebinding.yaml
+# Test:  kubectl auth can-i get pods --as=system:serviceaccount:default:aaik-sa
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: aaik-pod-reader
+  namespace: default
+rules:
+- apiGroups: [""]                      # "" = core API group
+  resources: ["pods", "pods/log"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: [""]
+  resources: ["configmaps"]
+  verbs: ["get", "list"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: aaik-pod-reader-binding
+  namespace: default
+subjects:
+- kind: ServiceAccount
+  name: aaik-sa                        # the SA we created
+  namespace: default
+roleRef:
+  kind: Role
+  name: aaik-pod-reader
+  apiGroup: rbac.authorization.k8s.io
