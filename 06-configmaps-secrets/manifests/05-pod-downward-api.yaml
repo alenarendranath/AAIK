@@ -1,0 +1,51 @@
+# Downward API — expose pod metadata as environment variables
+# Apply: kubectl apply -f 05-pod-downward-api.yaml
+# Verify: kubectl exec aaik-downward -- env | grep MY_
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: aaik-downward
+  labels:
+    app: aaik
+    version: "1.0"
+spec:
+  containers:
+  - name: aaik
+    image: nginx:alpine
+    resources:
+      requests:
+        cpu: "100m"
+        memory: "64Mi"
+      limits:
+        cpu: "200m"
+        memory: "128Mi"
+    env:
+    # Pod metadata
+    - name: MY_POD_NAME
+      valueFrom:
+        fieldRef:
+          fieldPath: metadata.name
+    - name: MY_POD_NAMESPACE
+      valueFrom:
+        fieldRef:
+          fieldPath: metadata.namespace
+    - name: MY_POD_IP
+      valueFrom:
+        fieldRef:
+          fieldPath: status.podIP
+    - name: MY_NODE_NAME
+      valueFrom:
+        fieldRef:
+          fieldPath: spec.nodeName
+    # Resource limits
+    - name: MY_CPU_REQUEST
+      valueFrom:
+        resourceFieldRef:
+          containerName: aaik
+          resource: requests.cpu
+    - name: MY_MEMORY_LIMIT
+      valueFrom:
+        resourceFieldRef:
+          containerName: aaik
+          resource: limits.memory
