@@ -1,0 +1,35 @@
+# HTTPRoute — defines routing rules (path, headers, traffic splitting)
+# Created by app developer
+
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: aaik-route
+spec:
+  parentRefs:
+  - name: aaik-gateway      # attach to this Gateway
+    sectionName: http        # specifically the HTTP listener
+  hostnames:
+  - aaik.example.com
+  rules:
+  # Rule 1: exact path match
+  - matches:
+    - path:
+        type: Exact
+        value: /health
+    backendRefs:
+    - name: aaik-clusterip
+      port: 80
+
+  # Rule 2: prefix match with traffic splitting (canary)
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /
+    backendRefs:
+    - name: aaik-clusterip      # stable version — 90% traffic
+      port: 80
+      weight: 90
+    - name: aaik-canary-svc     # canary version — 10% traffic
+      port: 80
+      weight: 10
