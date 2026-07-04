@@ -1,0 +1,25 @@
+# hostPath Volume — mounts a path from the NODE's filesystem
+# WARNING: Breaks pod portability. Use only for node-level agents.
+# Apply: kubectl apply -f 02-hostpath.yaml
+# Verify: kubectl exec aaik-hostpath -- ls /host-logs
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: aaik-hostpath
+  labels:
+    app: aaik
+spec:
+  containers:
+  - name: log-reader
+    image: busybox
+    command: ["/bin/sh", "-c", "ls /host-logs && sleep 3600"]
+    volumeMounts:
+    - name: host-logs
+      mountPath: /host-logs
+      readOnly: true
+  volumes:
+  - name: host-logs
+    hostPath:
+      path: /var/log               # path on the NODE (not container)
+      type: Directory              # Directory | File | FileOrCreate | DirectoryOrCreate
