@@ -1,0 +1,43 @@
+# Multi-container Pod — two containers sharing the same network and volume
+# Apply: kubectl apply -f 02-pod-multicontainer.yaml
+# Logs:  kubectl logs aaik-multi -c aaik
+#        kubectl logs aaik-multi -c log-writer
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: aaik-multi
+  labels:
+    app: aaik
+spec:
+  containers:
+  # Main application container
+  - name: aaik
+    image: nginx:alpine
+    ports:
+    - containerPort: 80
+    volumeMounts:
+    - name: shared-logs
+      mountPath: /var/log/nginx
+
+  # Sidecar: reads nginx logs and echoes them
+  - name: log-writer
+    image: busybox
+    command: ["/bin/sh", "-c"]
+    args:
+    - |
+      while true; do
+        if [ -f /logs/access.log ]; then
+          tail -f /logs/access.log
+        else
+          echo "Waiting for logs..."
+          sleep 5
+        fi
+      done
+    volumeMounts:
+    - name: shared-logs
+      mountPath: /logs
+
+  volumes:
+  - name: shared-logs
+    emptyDir: {}
