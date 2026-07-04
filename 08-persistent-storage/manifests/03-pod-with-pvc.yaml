@@ -1,0 +1,29 @@
+# Pod using a PersistentVolumeClaim
+# Data in /data persists even if the pod is deleted and recreated
+# Apply (after PV and PVC are created):
+#   kubectl apply -f 03-pod-with-pvc.yaml
+# Test:
+#   kubectl exec aaik-persistent -- sh -c "echo 'AAIK data' > /data/test.txt"
+#   kubectl delete pod aaik-persistent
+#   kubectl apply -f 03-pod-with-pvc.yaml
+#   kubectl exec aaik-persistent -- cat /data/test.txt   # data still there!
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: aaik-persistent
+  labels:
+    app: aaik
+spec:
+  containers:
+  - name: aaik
+    image: nginx:alpine
+    ports:
+    - containerPort: 80
+    volumeMounts:
+    - name: persistent-storage
+      mountPath: /data             # all data here survives pod restarts
+  volumes:
+  - name: persistent-storage
+    persistentVolumeClaim:
+      claimName: aaik-pvc          # reference the PVC by name
