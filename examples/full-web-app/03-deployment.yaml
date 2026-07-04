@@ -1,0 +1,70 @@
+# Step 3: Deployment — 3 replicas with config and storage mounted
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aaik-web
+  labels:
+    app: aaik-web
+  annotations:
+    kubernetes.io/change-cause: "Initial deployment"
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: aaik-web
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  minReadySeconds: 10
+  template:
+    metadata:
+      labels:
+        app: aaik-web
+    spec:
+      serviceAccountName: default
+      containers:
+      - name: web
+        image: nginx:alpine
+        ports:
+        - containerPort: 80
+        envFrom:
+        - configMapRef:
+            name: aaik-web-config        # inject all ConfigMap keys as env vars
+        volumeMounts:
+        - name: config
+          mountPath: /etc/nginx/conf.d/default.conf
+          subPath: nginx.conf            # mount only the nginx.conf key
+        - name: data
+          mountPath: /usr/share/nginx/html/data
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "64Mi"
+          limits:
+            cpu: "500m"
+            memory: "256Mi"
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 80
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: false
+          runAsUser: 0                   # nginx requires root for port 80; use 8080 + runAsNonRoot in production
+      volumes:
+      - name: config
+        configMap:
+          name: aaik-web-config
+      - name: data
+        persistentVolumeClaim:
+          claimName: aaik-web-pvc
