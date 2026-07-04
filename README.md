@@ -1,5 +1,11 @@
 # AAIK — Ale Action in Kubernetes 🚀
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Kubernetes](https://img.shields.io/badge/Kubernetes-1.29+-blue.svg)](https://kubernetes.io)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
+
+> **Original educational content** — All YAML manifests, explanations, and examples are original work by the author. See [DISCLAIMER.md](DISCLAIMER.md) for full legal notice.
+
 A hands-on Kubernetes learning repository covering every core concept through practical YAML manifests, kubectl commands, and real-world examples.
 
 ## The Demo Application
@@ -49,5 +55,13 @@ cd 01-getting-started && cat README.md
 3. Study `commands.md` for all kubectl commands
 4. Apply manifests from the `manifests/` folder
 5. Experiment, break things, and learn!
+
+## License
+
+This project is licensed under the [MIT License](LICENSE) — free to use, share, and modify with attribution.
+
+## Disclaimer
+
+This repository is an independent educational resource. See [DISCLAIMER.md](DISCLAIMER.md) for full legal notice.
 
 > *"The best way to learn Kubernetes is to run it."*
