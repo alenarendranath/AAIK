@@ -1,0 +1,30 @@
+# Liveness Probe — Exec Command
+# Runs a command inside the container
+# Exit code 0 = healthy, non-zero = unhealthy → restart
+# Apply: kubectl apply -f 02-liveness-exec.yaml
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: aaik-liveness-exec
+  labels:
+    app: aaik
+spec:
+  containers:
+  - name: aaik
+    image: busybox
+    command: ["/bin/sh", "-c"]
+    args:
+    - |
+      touch /tmp/healthy
+      sleep 30
+      rm /tmp/healthy
+      sleep 600
+    livenessProbe:
+      exec:
+        command:
+        - cat
+        - /tmp/healthy
+      initialDelaySeconds: 5
+      periodSeconds: 5
+      failureThreshold: 3
