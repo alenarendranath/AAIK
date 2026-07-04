@@ -1,0 +1,54 @@
+# ReplicaSet + HorizontalPodAutoscaler
+# HPA automatically adjusts replicas based on CPU usage
+# Note: In practice use Deployment + HPA; this shows the concept
+# Apply: kubectl apply -f 02-replicaset-with-hpa.yaml
+# Watch: kubectl get hpa aaik-rs-hpa -w
+
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: aaik-rs-hpa
+  labels:
+    app: aaik-hpa
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: aaik-hpa
+  template:
+    metadata:
+      labels:
+        app: aaik-hpa
+    spec:
+      containers:
+      - name: aaik
+        image: nginx:alpine
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            cpu: "100m"              # HPA needs resource requests defined
+            memory: "64Mi"
+          limits:
+            cpu: "500m"
+            memory: "128Mi"
+
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: aaik-rs-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: ReplicaSet
+    name: aaik-rs-hpa
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 50       # scale up when CPU > 50%
