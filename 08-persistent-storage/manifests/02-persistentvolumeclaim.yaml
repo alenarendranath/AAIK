@@ -1,0 +1,18 @@
+# PersistentVolumeClaim — app requests storage
+# Kubernetes binds it to a matching PV
+# Apply: kubectl apply -f 02-persistentvolumeclaim.yaml
+# Check: kubectl get pvc (should show STATUS=Bound)
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: aaik-pvc
+  labels:
+    app: aaik
+spec:
+  storageClassName: manual         # must match the PV's storageClassName
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 500Mi               # request 500MB (must be <= PV capacity)
