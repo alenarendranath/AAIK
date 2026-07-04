@@ -1,0 +1,29 @@
+# DaemonSet with node selector — runs only on GPU nodes
+# Label a node first: kubectl label node <node> gpu=cuda
+# Apply: kubectl apply -f 02-daemonset-node-selector.yaml
+
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: aaik-gpu-agent
+  labels:
+    app: aaik-gpu-agent
+spec:
+  selector:
+    matchLabels:
+      app: aaik-gpu-agent
+  template:
+    metadata:
+      labels:
+        app: aaik-gpu-agent
+    spec:
+      nodeSelector:
+        gpu: cuda                  # only run on nodes with label gpu=cuda
+      containers:
+      - name: gpu-agent
+        image: busybox
+        command: ["/bin/sh", "-c", "echo 'GPU agent running' && sleep infinity"]
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "64Mi"
