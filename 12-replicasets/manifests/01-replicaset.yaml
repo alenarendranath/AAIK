@@ -1,0 +1,40 @@
+# ReplicaSet — maintains 3 replicas of the AAIK pod
+# Apply: kubectl apply -f 01-replicaset.yaml
+# Scale: kubectl scale rs aaik-rs --replicas=5
+# Watch: kubectl get pods -l app=aaik -w
+
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: aaik-rs
+  labels:
+    app: aaik
+spec:
+  replicas: 3                        # desired number of pod replicas
+  selector:
+    matchLabels:
+      app: aaik                      # RS owns pods with this label
+  template:                          # pod template — used to create new pods
+    metadata:
+      labels:
+        app: aaik                    # MUST match spec.selector.matchLabels
+        version: "1.0"
+    spec:
+      containers:
+      - name: aaik
+        image: nginx:alpine
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "64Mi"
+          limits:
+            cpu: "200m"
+            memory: "128Mi"
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 5
