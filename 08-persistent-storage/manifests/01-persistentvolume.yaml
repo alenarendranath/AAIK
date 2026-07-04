@@ -1,0 +1,21 @@
+# PersistentVolume — static provisioning (admin creates this)
+# Apply: kubectl apply -f 01-persistentvolume.yaml
+# Check: kubectl get pv
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: aaik-pv-local
+  labels:
+    type: local
+    app: aaik
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 1Gi
+  accessModes:
+  - ReadWriteOnce                  # only one node can mount read/write
+  persistentVolumeReclaimPolicy: Retain   # keep data when PVC is deleted
+  hostPath:                        # for local testing only
+    path: /tmp/aaik-data
+    type: DirectoryOrCreate
