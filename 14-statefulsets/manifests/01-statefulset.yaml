@@ -1,0 +1,64 @@
+# StatefulSet with persistent storage per pod
+# Requires a headless Service and a StorageClass
+# Apply: kubectl apply -f 01-statefulset.yaml
+# Watch: kubectl get pods -l app=aaik-db -w
+# DNS:   kubectl exec -it aaik-db-0 -- nslookup aaik-db-0.aaik-db-headless
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: aaik-db-headless           # governing headless service (required)
+  labels:
+    app: aaik-db
+spec:
+  clusterIP: None                  # headless
+  publishNotReadyAddresses: true   # include unready pods in DNS
+  selector:
+    app: aaik-db
+  ports:
+  - name: http
+    port: 80
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: aaik-db
+spec:
+  serviceName: aaik-db-headless    # must match the headless Service name
+  replicas: 3
+  selector:
+    matchLabels:
+      app: aaik-db
+  template:
+    metadata:
+      labels:
+        app: aaik-db
+    spec:
+      containers:
+      - name: aaik-db
+        image: nginx:alpine
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: data
+          mountPath: /var/data     # each pod gets its own persistent /var/data
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 5
+  volumeClaimTemplates:            # creates one PVC per pod automatically
+  - metadata:
+      name: data
+    spec:
+      accessModes: [ReadWriteOnce]
+      resources:
+        requests:
+          storage: 1Gi
+  updateStrategy:
+    type: RollingUpdate
+  persistentVolumeClaimRetentionPolicy:
+    whenDeleted: Retain            # keep PVCs when StatefulSet is deleted
+    whenScaled: Retain             # keep PVCs when scaling down
