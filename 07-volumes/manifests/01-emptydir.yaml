@@ -1,0 +1,67 @@
+# emptyDir Volume — ephemeral, shared between containers in same pod
+# Apply: kubectl apply -f 01-emptydir.yaml
+# Test:  kubectl exec aaik-emptydir -c writer -- cat /shared/message.txt
+#        kubectl exec aaik-emptydir -c reader -- cat /data/message.txt
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: aaik-emptydir
+  labels:
+    app: aaik
+spec:
+  containers:
+  # Writer: writes a message to the shared volume
+  - name: writer
+    image: busybox
+    command: ["/bin/sh", "-c"]
+    args:
+    - |
+      while true; do
+        echo "AAIK message at $(date)" > /shared/message.txt
+        sleep 5
+      done
+    volumeMounts:
+    - name: shared-data
+      mountPath: /shared
+
+  # Reader: reads from the same shared volume
+  - name: reader
+    image: busybox
+    command: ["/bin/sh", "-c"]
+    args:
+    - |
+      while true; do
+        if [ -f /data/message.txt ]; then
+          echo "Read: $(cat /data/message.txt)"
+        fi
+        sleep 5
+      done
+    volumeMounts:
+    - name: shared-data
+      mountPath: /data             # same volume, different mountPath
+
+  volumes:
+  - name: shared-data
+    emptyDir: {}                   # default: disk-backed
+
+---
+# emptyDir with memory backing (tmpfs) — faster, counts against memory limit
+apiVersion: v1
+kind: Pod
+metadata:
+  name: aaik-emptydir-memory
+  labels:
+    app: aaik
+spec:
+  containers:
+  - name: aaik
+    image: nginx:alpine
+    volumeMounts:
+    - name: cache
+      mountPath: /var/cache/nginx
+  volumes:
+  - name: cache
+    emptyDir:
+      medium: Memory               # use RAM
+      sizeLimit: 64Mi              # cap at 64MB
