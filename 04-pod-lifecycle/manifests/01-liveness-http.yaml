@@ -1,0 +1,27 @@
+# Liveness Probe — HTTP GET
+# Kubernetes calls GET /healthz every 5s
+# If it fails 3 times → container is restarted
+# Apply: kubectl apply -f 01-liveness-http.yaml
+# Watch: kubectl get pod aaik-liveness-http -w
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: aaik-liveness-http
+  labels:
+    app: aaik
+spec:
+  containers:
+  - name: aaik
+    image: nginx:alpine
+    ports:
+    - containerPort: 80
+    livenessProbe:
+      httpGet:
+        path: /               # nginx returns 200 for /
+        port: 80
+      initialDelaySeconds: 5  # wait 5s after container starts
+      periodSeconds: 10       # check every 10s
+      timeoutSeconds: 3       # timeout if no response in 3s
+      failureThreshold: 3     # restart after 3 consecutive failures
+      successThreshold: 1     # 1 success clears failure count
