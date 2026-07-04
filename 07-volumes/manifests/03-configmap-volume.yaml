@@ -1,0 +1,49 @@
+# ConfigMap Volume — mount config files from a ConfigMap
+# Each ConfigMap key becomes a file in the mounted directory
+# Apply: kubectl apply -f 03-configmap-volume.yaml
+# Verify: kubectl exec aaik-cm-vol -- ls /etc/aaik/
+#         kubectl exec aaik-cm-vol -- cat /etc/aaik/APP_ENV
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: aaik-file-config
+data:
+  APP_ENV: "production"
+  app.properties: |
+    server.port=80
+    log.level=INFO
+    max.connections=100
+  startup.sh: |
+    #!/bin/sh
+    echo "Starting AAIK..."
+    nginx -g "daemon off;"
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: aaik-cm-vol
+  labels:
+    app: aaik
+spec:
+  containers:
+  - name: aaik
+    image: nginx:alpine
+    volumeMounts:
+    # Mount ALL keys as files
+    - name: config-vol
+      mountPath: /etc/aaik
+      readOnly: true
+    # Mount a SINGLE key as a specific file
+    - name: startup-vol
+      mountPath: /docker-entrypoint.d/startup.sh
+      subPath: startup.sh
+  volumes:
+  - name: config-vol
+    configMap:
+      name: aaik-file-config
+  - name: startup-vol
+    configMap:
+      name: aaik-file-config
+      defaultMode: 0755            # make files executable
