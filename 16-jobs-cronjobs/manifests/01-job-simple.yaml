@@ -1,0 +1,32 @@
+# Simple Job — runs once to completion
+# Apply: kubectl apply -f 01-job-simple.yaml
+# Watch: kubectl get pods -l job-name=aaik-job -w
+# Logs:  kubectl logs job/aaik-job
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: aaik-job
+  labels:
+    app: aaik
+spec:
+  completions: 1                   # 1 successful completion required
+  parallelism: 1                   # 1 pod at a time
+  backoffLimit: 3                  # retry up to 3 times on failure
+  ttlSecondsAfterFinished: 300     # auto-delete 5 minutes after completion
+  template:
+    metadata:
+      labels:
+        job-name: aaik-job
+    spec:
+      restartPolicy: OnFailure     # Jobs must use OnFailure or Never
+      containers:
+      - name: worker
+        image: busybox
+        command: ["/bin/sh", "-c"]
+        args:
+        - |
+          echo "AAIK Job started at $(date)"
+          echo "Processing data..."
+          sleep 5
+          echo "AAIK Job completed successfully at $(date)"
