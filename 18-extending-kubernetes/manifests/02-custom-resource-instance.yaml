@@ -1,0 +1,19 @@
+# AaikDatabase — an instance of our custom resource
+# Requires CRD from 01-custom-resource-definition.yaml to be applied first
+# Apply: kubectl apply -f 02-custom-resource-instance.yaml
+# Watch: kubectl get aadb -w
+#        kubectl describe aadb aaik-prod-db
+
+apiVersion: aaik.dev/v1
+kind: AaikDatabase
+metadata:
+  name: aaik-prod-db
+  namespace: default
+  labels:
+    env: production
+    app: aaik
+spec:
+  replicas: 3
+  storage: "10Gi"
+  version: "15"
+  backupEnabled: true
