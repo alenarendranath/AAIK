@@ -1,0 +1,19 @@
+# Headless Service — no ClusterIP, DNS returns pod IPs directly
+# Used with StatefulSets for stable per-pod DNS
+# Apply: kubectl apply -f 04-service-headless.yaml
+# DNS: nslookup aaik-headless  → returns individual pod IPs
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: aaik-headless
+  labels:
+    app: aaik
+spec:
+  clusterIP: None                  # THIS makes it headless
+  selector:
+    app: aaik
+  ports:
+  - name: http
+    port: 80
+    targetPort: 80
