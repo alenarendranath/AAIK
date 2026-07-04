@@ -1,0 +1,53 @@
+# Projected Volume — combine multiple sources into ONE mountPath
+# Merges: ConfigMap + Secret + Downward API + ServiceAccount Token
+# Apply: kubectl apply -f 05-projected-volume.yaml
+# Verify: kubectl exec aaik-projected -- ls /etc/projected/
+#         kubectl exec aaik-projected -- cat /etc/projected/APP_ENV
+#         kubectl exec aaik-projected -- cat /etc/projected/API_KEY
+#         kubectl exec aaik-projected -- cat /etc/projected/namespace
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: aaik-projected
+  labels:
+    app: aaik
+spec:
+  containers:
+  - name: aaik
+    image: nginx:alpine
+    volumeMounts:
+    - name: all-in-one
+      mountPath: /etc/projected   # single directory with everything
+      readOnly: true
+  volumes:
+  - name: all-in-one
+    projected:
+      sources:
+      # Source 1: ConfigMap keys
+      - configMap:
+          name: aaik-config
+          items:
+          - key: APP_ENV
+            path: APP_ENV
+          - key: LOG_LEVEL
+            path: LOG_LEVEL
+      # Source 2: Secret keys
+      - secret:
+          name: aaik-credentials
+          items:
+          - key: API_KEY
+            path: API_KEY
+      # Source 3: Downward API (pod metadata as files)
+      - downwardAPI:
+          items:
+          - path: namespace
+            fieldRef:
+              fieldPath: metadata.namespace
+          - path: pod-name
+            fieldRef:
+              fieldPath: metadata.name
+      # Source 4: ServiceAccount token (auto-refreshed)
+      - serviceAccountToken:
+          path: token
+          expirationSeconds: 3600
