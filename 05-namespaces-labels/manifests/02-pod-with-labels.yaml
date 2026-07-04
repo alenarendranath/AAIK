@@ -1,0 +1,26 @@
+# Pod with rich labels and annotations
+# Apply: kubectl apply -f 02-pod-with-labels.yaml
+# Filter: kubectl get pods -l app=aaik,env=production
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: aaik-labeled
+  namespace: default
+  labels:
+    app: aaik
+    tier: frontend
+    env: production
+    version: "1.0"
+    release: stable
+  annotations:
+    kubernetes.io/change-cause: "Initial deployment"
+    git-commit: "abc123"
+    deployed-by: "ci-pipeline"
+    contact: "team-platform@example.com"
+spec:
+  containers:
+  - name: aaik
+    image: nginx:alpine
+    ports:
+    - containerPort: 80
