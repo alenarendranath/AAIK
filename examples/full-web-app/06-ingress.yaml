@@ -1,0 +1,24 @@
+# Step 6: Ingress — external HTTP routing
+# Requires nginx ingress controller:
+# kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/cloud/deploy.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: aaik-web-ingress
+  labels:
+    app: aaik-web
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: aaik.example.com             # replace with your domain
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: aaik-web-svc
+            port:
+              number: 80
