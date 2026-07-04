@@ -1,0 +1,14 @@
+# Step 5: Service — ClusterIP load balancing
+apiVersion: v1
+kind: Service
+metadata:
+  name: aaik-web-svc
+  labels:
+    app: aaik-web
+spec:
+  selector:
+    app: aaik-web
+  ports:
+  - name: http
+    port: 80
+    targetPort: 80
