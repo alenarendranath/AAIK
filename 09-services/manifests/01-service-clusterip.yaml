@@ -1,0 +1,19 @@
+# ClusterIP Service — internal cluster access only (default type)
+# Apply: kubectl apply -f 01-service-clusterip.yaml
+# Test (from inside cluster): curl http://aaik-clusterip/
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: aaik-clusterip
+  labels:
+    app: aaik
+spec:
+  type: ClusterIP                  # default; can omit this line
+  selector:
+    app: aaik                      # routes to pods with this label
+  ports:
+  - name: http
+    port: 80                       # port clients use to reach the Service
+    targetPort: 80                 # port the container listens on
+    protocol: TCP
