@@ -1,0 +1,30 @@
+# ConfigMap — key-value configuration data
+# Apply: kubectl apply -f 01-configmap.yaml
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: aaik-config
+data:
+  # Simple key-value pairs (used as env vars)
+  APP_ENV: "production"
+  LOG_LEVEL: "info"
+  MAX_CONNECTIONS: "100"
+  APP_PORT: "80"
+
+  # File-like values (used as volume files)
+  nginx.conf: |
+    server {
+      listen 80;
+      server_name aaik.example.com;
+      location / {
+        return 200 'AAIK is running!
+';
+        add_header Content-Type text/plain;
+      }
+      location /health {
+        return 200 'OK
+';
+        add_header Content-Type text/plain;
+      }
+    }
