@@ -1,0 +1,66 @@
+# Blue-Green Deployment Pattern
+# Run two full environments; switch traffic instantly via Service selector
+# Apply: kubectl apply -f 04-deployment-blue-green.yaml
+# Switch to green: kubectl patch svc aaik-bluegreen -p '{"spec":{"selector":{"version":"green"}}}'
+# Switch back:     kubectl patch svc aaik-bluegreen -p '{"spec":{"selector":{"version":"blue"}}}'
+
+# Blue (current live version)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aaik-blue
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: aaik-bg
+      version: blue
+  template:
+    metadata:
+      labels:
+        app: aaik-bg
+        version: blue
+    spec:
+      containers:
+      - name: aaik
+        image: nginx:alpine
+        ports:
+        - containerPort: 80
+
+---
+# Green (new version — deploy, test, then switch Service)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aaik-green
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: aaik-bg
+      version: green
+  template:
+    metadata:
+      labels:
+        app: aaik-bg
+        version: green
+    spec:
+      containers:
+      - name: aaik
+        image: nginx:1.25
+        ports:
+        - containerPort: 80
+
+---
+# Service — currently points to blue; switch to green when ready
+apiVersion: v1
+kind: Service
+metadata:
+  name: aaik-bluegreen
+spec:
+  selector:
+    app: aaik-bg
+    version: blue                  # change to "green" to switch traffic
+  ports:
+  - port: 80
+    targetPort: 80
