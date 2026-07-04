@@ -1,0 +1,19 @@
+# Pod with nodeSelector — schedule on specific nodes
+# First label a node: kubectl label node <node> disk=ssd
+# Apply: kubectl apply -f 03-pod-node-selector.yaml
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: aaik-node-selector
+  labels:
+    app: aaik
+spec:
+  nodeSelector:
+    disk: ssd                   # only schedule on nodes with disk=ssd
+    kubernetes.io/arch: amd64   # only on amd64 nodes
+  containers:
+  - name: aaik
+    image: nginx:alpine
+    ports:
+    - containerPort: 80
