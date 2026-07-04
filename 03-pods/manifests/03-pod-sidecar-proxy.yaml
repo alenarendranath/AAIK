@@ -1,0 +1,44 @@
+# Sidecar Proxy Pattern
+# Main app on port 8080 (internal) + nginx reverse proxy on port 80 (external)
+# Apply: kubectl apply -f 03-pod-sidecar-proxy.yaml
+# Test:  kubectl port-forward pod/aaik-sidecar 8080:80
+#        curl http://localhost:8080
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: aaik-sidecar
+  labels:
+    app: aaik
+spec:
+  containers:
+  # Main AAIK application (internal only)
+  - name: aaik-app
+    image: nginx:alpine
+    # Simulate app on port 8080
+    command: ["/bin/sh", "-c"]
+    args:
+    - |
+      echo "server { listen 8080; location / { return 200 'AAIK App Response
+'; } }" > /etc/nginx/conf.d/default.conf
+      nginx -g 'daemon off;'
+    ports:
+    - containerPort: 8080
+      name: app
+
+  # Sidecar: nginx reverse proxy (external traffic comes here)
+  - name: proxy
+    image: nginx:alpine
+    command: ["/bin/sh", "-c"]
+    args:
+    - |
+      echo 'server {
+        listen 80;
+        location / {
+          proxy_pass http://localhost:8080;
+        }
+      }' > /etc/nginx/conf.d/default.conf
+      nginx -g "daemon off;"
+    ports:
+    - containerPort: 80
+      name: http
