@@ -1,28 +1,31 @@
-# Disclaimer & Legal Notice
+# Disclaimer
+
+**AleK8s** is an original educational project created by Narendranath for learning and teaching Kubernetes.
 
 ## Original Work
 
-All content in this repository — including YAML manifests, kubectl command references, concept explanations, diagrams, and documentation — is **original work** created by the repository author.
+All content in this repository — including README files, YAML manifests, kubectl command references, examples, troubleshooting guides, and cheatsheets — was written from scratch as original educational material.
 
-## Kubernetes Trademark
+- Kubernetes resource specifications (like pod specs, deployment specs, etc.) represent standard API definitions documented by the Cloud Native Computing Foundation (CNCF). API schemas are not copyrightable.
+- YAML manifests are original works based on publicly documented Kubernetes API specifications.
 
-"Kubernetes" is a trademark of the Linux Foundation. This repository is an **independent educational resource** and is not affiliated with, endorsed by, or sponsored by the Linux Foundation, CNCF (Cloud Native Computing Foundation), Google, or any other organization.
+## No Affiliation
 
-## Third-Party Tools & Images
+This project is not affiliated with, endorsed by, or associated with:
+- The Cloud Native Computing Foundation (CNCF)
+- The Linux Foundation
+- Any Kubernetes distribution or cloud provider
 
-This repository references publicly available open-source tools and container images:
+"Kubernetes" is a registered trademark of the Linux Foundation.
 
-- **Kubernetes** — Apache License 2.0 (https://github.com/kubernetes/kubernetes)
-- **nginx** (docker image `nginx:alpine`) — BSD 2-Clause License
-- **busybox** (docker image `busybox`) — GPL and others (varies per component)
-- **kubectl** — Apache License 2.0
+## Third-Party Software
 
-All referenced tools and images belong to their respective owners and are used here purely for **educational demonstration purposes**.
+Container images referenced in this repository include:
+- `nginx` (nginx:alpine) — BSD 2-Clause License
+- `busybox` — GPLv2 License
 
-## No Warranty
+These images are referenced for educational purposes only. See their respective licenses for usage terms.
 
-The examples and commands in this repository are provided for **educational purposes only**. They may not be suitable for production use without review and modification. The author assumes no responsibility for any issues arising from the use of this material.
+## License
 
-## Contributing
-
-Contributions are welcome under the same MIT License. By contributing, you agree that your contributions are your own original work.
+This repository is licensed under the MIT License. See [LICENSE](./LICENSE).
