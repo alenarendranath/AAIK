@@ -1,0 +1,23 @@
+# LoadBalancer Service — provisions an external cloud load balancer
+# Works on: GKE, EKS, AKS, and bare-metal with MetalLB
+# Apply: kubectl apply -f 03-service-loadbalancer.yaml
+# Check: kubectl get svc aaik-lb (wait for EXTERNAL-IP)
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: aaik-lb
+  labels:
+    app: aaik
+spec:
+  type: LoadBalancer
+  selector:
+    app: aaik
+  ports:
+  - name: http
+    port: 80
+    targetPort: 80
+  - name: https
+    port: 443
+    targetPort: 443
+  externalTrafficPolicy: Local     # preserve client source IP (avoids extra hop)
