@@ -1,0 +1,46 @@
+# StatefulSet with Parallel pod management
+# All pods start/stop simultaneously instead of ordered
+# Use when: ordering doesn't matter (e.g., cache clusters)
+# Apply: kubectl apply -f 02-statefulset-parallel.yaml
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: aaik-cache-headless
+spec:
+  clusterIP: None
+  selector:
+    app: aaik-cache
+  ports:
+  - port: 80
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: aaik-cache
+spec:
+  serviceName: aaik-cache-headless
+  replicas: 3
+  podManagementPolicy: Parallel    # start/stop all pods at the same time
+  selector:
+    matchLabels:
+      app: aaik-cache
+  template:
+    metadata:
+      labels:
+        app: aaik-cache
+    spec:
+      containers:
+      - name: cache
+        image: nginx:alpine
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            cpu: "50m"
+            memory: "32Mi"
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      partition: 0                 # set to N to update only pods >= N (canary for StatefulSets)
