@@ -1,0 +1,36 @@
+# Inject ConfigMap values as environment variables
+# Method 1: Individual keys (valueFrom)
+# Method 2: All keys at once (envFrom)
+# Apply: kubectl apply -f 03-pod-env-from-configmap.yaml
+# Verify: kubectl exec aaik-env-config -- env | grep -E 'APP|LOG|MAX'
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: aaik-env-config
+  labels:
+    app: aaik
+spec:
+  containers:
+  - name: aaik
+    image: nginx:alpine
+    env:
+    # Method 1: inject specific keys
+    - name: ENVIRONMENT
+      valueFrom:
+        configMapKeyRef:
+          name: aaik-config
+          key: APP_ENV
+    - name: LOG_LEVEL
+      valueFrom:
+        configMapKeyRef:
+          name: aaik-config
+          key: LOG_LEVEL
+    # Method 2: inject all keys from ConfigMap at once
+    envFrom:
+    - configMapRef:
+        name: aaik-config
+      prefix: "CFG_"            # optional: prefix all keys with CFG_
+    # Inject from Secret
+    - secretRef:
+        name: aaik-secret
