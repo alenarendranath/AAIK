@@ -1,0 +1,38 @@
+# CronJob — runs a Job on a schedule
+# Apply: kubectl apply -f 04-cronjob.yaml
+# Watch: kubectl get cj aaik-cron -w
+#        kubectl get jobs -l app=aaik-cron
+
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: aaik-cron
+  labels:
+    app: aaik-cron
+spec:
+  schedule: "*/5 * * * *"         # run every 5 minutes
+  timezone: "UTC"                  # explicit timezone (K8s 1.25+)
+  concurrencyPolicy: Forbid        # skip if previous run still active
+  successfulJobsHistoryLimit: 3    # keep last 3 successful jobs
+  failedJobsHistoryLimit: 1        # keep last 1 failed job
+  startingDeadlineSeconds: 60      # skip if missed by >60s
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      ttlSecondsAfterFinished: 600
+      template:
+        metadata:
+          labels:
+            app: aaik-cron
+        spec:
+          restartPolicy: OnFailure
+          containers:
+          - name: cron-worker
+            image: busybox
+            command: ["/bin/sh", "-c"]
+            args:
+            - |
+              echo "AAIK CronJob running at $(date)"
+              echo "Performing scheduled task..."
+              sleep 10
+              echo "Scheduled task complete!"
